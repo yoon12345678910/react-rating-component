@@ -14,7 +14,7 @@ export interface IconContainerProps extends React.HTMLAttributes<HTMLSpanElement
   value: number;
 }
 
-export interface RatingProps {
+export type RatingProps = {
   /**
    * Rating 정밀도, 증가 또는 감소 값.
    * @default 1
@@ -82,7 +82,7 @@ export interface RatingProps {
    * @param {number|null} value 새로운값
    */
   onChange?: (e: React.SyntheticEvent, value: number | null) => void;
-}
+};
 
 /**
  * `precision` 에 따라 가장 가까운 숫자 찾기.
