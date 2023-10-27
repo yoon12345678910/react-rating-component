@@ -41,9 +41,9 @@ export interface RatingItemProps {
    */
   selectedRatingValue: number | null;
   /**
-   * 아이콘 사이즈.
+   * 선택한 아이콘만 강조 여부.
    */
-  size: number;
+  highlightSelectedOnly: boolean;
   /**
    * hover 값.
    */
@@ -98,6 +98,7 @@ const RatingItem = (props: RatingItemProps) => {
     itemValue,
     activeRatingValue,
     selectedRatingValue,
+    highlightSelectedOnly,
     hover,
     focus,
     labelProps,
@@ -111,7 +112,9 @@ const RatingItem = (props: RatingItemProps) => {
   } = props;
 
   const id = useId();
-  const isFilled = activeRatingValue !== null && itemValue <= activeRatingValue;
+  const isFilled =
+    activeRatingValue !== null &&
+    (highlightSelectedOnly ? itemValue === activeRatingValue : itemValue <= activeRatingValue);
   const isHovered = itemValue <= hover;
   const isFocused = itemValue <= focus;
   const isChecked = itemValue === selectedRatingValue;

@@ -41,6 +41,11 @@ export interface RatingProps {
    */
   disabled?: boolean;
   /**
+   * 'true'인 경우 선택한 아이콘만 강조.
+   * @default false
+   */
+  highlightSelectedOnly?: boolean;
+  /**
    * 아이콘 사이즈.
    * @default 24
    */
@@ -108,6 +113,7 @@ const Rating = (props?: RatingProps) => {
     max = 5,
     readOnly = false,
     disabled = false,
+    highlightSelectedOnly = false,
     size = 24,
     value: valueProp = null,
     prefix,
@@ -205,7 +211,7 @@ const Rating = (props?: RatingProps) => {
     disabled,
     activeRatingValue: value,
     selectedRatingValue: selectedValue,
-    size,
+    highlightSelectedOnly,
     hover,
     focus,
     emptyIcon,
