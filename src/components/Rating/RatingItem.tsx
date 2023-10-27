@@ -1,35 +1,48 @@
 import React, { useId } from 'react';
 import clsx from 'clsx';
 
-import ratingClasses from './ratingClasses';
+import type { IconContainerProps } from './Rating';
+import type { RatingClasses } from './ratingClasses';
 import RatingIcon from './RatingIcon';
 import RatingLabel from './RatingLabel';
 import VisuallyHiddenInput from './VisuallyHiddenInput';
 
 export interface RatingItemProps {
   /**
-   * Radio `input` 요소의 이름 속성값
+   * 재정의된 className.
+   */
+  classes: RatingClasses;
+  /**
+   * Radio `input` 요소의 이름 속성값.
    */
   name?: string;
   /**
-   * 아이콘 활성화 유무
+   * 아이콘 활성화 유무.
    */
   isActive: boolean;
   /**
-   * 읽기전용 여부
+   * 읽기전용 여부.
    */
   readOnly: boolean;
   /**
-   * 비활성화 유무
+   * 비활성화 유무.
    */
   disabled: boolean;
-  /** */
+  /**
+   * 아이콘 Rating 인덱스.
+   */
   itemValue: number;
-  /** */
-  ratingValue: number | null;
-  /** */
-  ratingValueRounded: number | null;
-  /** */
+  /**
+   * 활성 Rating 값, 동작에 따라 `selected` | `hover` | `focus` 값을 할당.
+   */
+  activeRatingValue: number | null;
+  /**
+   * 선택된 Rating 값.
+   */
+  selectedRatingValue: number | null;
+  /**
+   * 아이콘 사이즈.
+   */
   size: number;
   /**
    * hover 값.
@@ -54,42 +67,43 @@ export interface RatingItemProps {
    */
   filledIcon: React.ReactNode;
   /**
-   *
+   * 아이콘을 포함하는 컴포넌트.
    */
-  IconContainerComponent?: React.ElementType;
+  IconContainerComponent?: React.ElementType<IconContainerProps>;
   /**
    * 값이 변경되면 호출할 콜백함수.
    */
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /**
-   * `click` 이벤트 호출할 콜백함수.
+   * 아이콘 `click` 이벤트 발생시 호출할 콜백함수.
    */
   onClick: (e: React.MouseEvent<HTMLInputElement>) => void;
   /**
-   * `focus` 이벤트 호출할 콜백함수.
+   * 아이콘 `focus` 이벤트 발생시 호출할 콜백함수.
    */
   onFocus: (e: React.FocusEvent<HTMLInputElement>) => void;
   /**
-   * `focus` 이벤트 호출할 콜백함수.
+   * 아이콘 `blur` 이벤트 발생시 호출할 콜백함수.
    */
   onBlur: () => void;
 }
 
 const RatingItem = (props: RatingItemProps) => {
   const {
+    classes,
     name,
     isActive,
     readOnly,
     disabled,
     itemValue,
-    ratingValue,
-    ratingValueRounded,
+    activeRatingValue,
+    selectedRatingValue,
     hover,
     focus,
     labelProps,
     emptyIcon,
     filledIcon,
-    // IconContainerComponent,
+    IconContainerComponent,
     onChange,
     onClick,
     onFocus,
@@ -97,22 +111,28 @@ const RatingItem = (props: RatingItemProps) => {
   } = props;
 
   const id = useId();
-  const isFilled = ratingValue !== null && itemValue <= ratingValue;
+  const isFilled = activeRatingValue !== null && itemValue <= activeRatingValue;
   const isHovered = itemValue <= hover;
   const isFocused = itemValue <= focus;
-  const isChecked = itemValue === ratingValueRounded;
+  const isChecked = itemValue === selectedRatingValue;
 
   const RatingIconRender = (
     <RatingIcon
-      // as={IconContainerComponent}
-      className={clsx(ratingClasses.icon, {
-        [ratingClasses.iconEmpty]: !isFilled,
-        [ratingClasses.iconFilled]: isFilled,
-        [ratingClasses.iconHover]: isHovered,
-        [ratingClasses.iconFocus]: isFocused,
-        [ratingClasses.iconActive]: isActive,
+      as={
+        IconContainerComponent ? (iconProps) => <IconContainerComponent value={itemValue} {...iconProps} /> : undefined
+      }
+      className={clsx(classes.icon, {
+        [classes.iconEmpty]: !isFilled,
+        [classes.iconFilled]: isFilled,
+        [classes.iconHover]: isHovered,
+        [classes.iconFocus]: isFocused,
+        [classes.iconActive]: isActive,
       })}
-      // value={itemValue}
+      state={{
+        iconEmpty: !isFilled,
+        iconActive: isActive,
+      }}
+      classes={classes}
     >
       {emptyIcon && !isFilled ? emptyIcon : filledIcon}
     </RatingIcon>
@@ -124,12 +144,12 @@ const RatingItem = (props: RatingItemProps) => {
 
   return (
     <>
-      <RatingLabel htmlFor={id} className={ratingClasses.label} {...labelProps}>
+      <RatingLabel htmlFor={id} className={classes.label} {...labelProps}>
         {RatingIconRender}
       </RatingLabel>
       <VisuallyHiddenInput
         type="radio"
-        className={ratingClasses.visuallyHiddenInput}
+        className={classes.visuallyHiddenInput}
         id={id}
         name={name}
         value={itemValue}

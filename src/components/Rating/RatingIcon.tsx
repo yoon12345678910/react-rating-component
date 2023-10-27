@@ -1,36 +1,27 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import ratingClasses from './ratingClasses';
+import type { RatingClasses } from './ratingClasses';
 
 export const iconActiveStyle = {
   default: css`
     cursor: inherit;
     transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   `,
-  iconActive: css`
+  iconActive: ({ classes }: { classes: RatingClasses }) => css`
     transform: scale(1.2);
-
-    ${`.${ratingClasses.focusVisible}`} & {
+    ${`.${classes.focusVisible}`} & {
       outline: 1px solid #999;
     }
   `,
 };
 
-const RatingIcon = styled.span`
+const RatingIcon = styled.span<{
+  state: { iconActive: boolean; iconEmpty: boolean };
+  classes: RatingClasses;
+}>`
   display: flex;
   pointer-events: none;
-
-  ${iconActiveStyle.default}
-
-  &${`.${ratingClasses.iconEmpty}`} > svg {
-    color: rgba(0, 0, 0, 0.26);
-  }
-
-  &${`.${ratingClasses.iconActive}`} {
-    ${iconActiveStyle.iconActive}
-  }
-
   > svg {
     display: inline-block;
     flex-shrink: 0;
@@ -40,6 +31,18 @@ const RatingIcon = styled.span`
     transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     user-select: none;
   }
+  ${iconActiveStyle.default}
+  ${({ state, classes }) => ({
+    ...css`
+      &${`.${classes.iconEmpty}`} > svg {
+        color: rgba(0, 0, 0, 0.26);
+      }
+    `,
+    ...(state.iconActive &&
+      css`
+        ${iconActiveStyle.iconActive({ classes })}
+      `),
+  })}
 `;
 
 export default RatingIcon;

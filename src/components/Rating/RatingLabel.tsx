@@ -1,10 +1,10 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-const RatingLabel = styled('label')<{ styleState?: { labelEmptyValueActive?: boolean } }>`
+const RatingLabel = styled('label')<{ state?: { labelEmptyValueActive?: boolean } }>`
   cursor: inherit;
-  ${({ styleState }) => ({
-    ...(styleState?.labelEmptyValueActive &&
+  ${({ state }) => ({
+    ...(state?.labelEmptyValueActive &&
       css`
         top: 0;
         bottom: 0;

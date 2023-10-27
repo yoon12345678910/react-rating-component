@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import clsx from 'clsx';
 import styled from '@emotion/styled';
 
+import generatePrefixClasses from './generatePrefixClasses';
 import ratingClasses from './ratingClasses';
 import RatingDecimal from './RatingDecimal';
 import RatingItem from './RatingItem';
@@ -15,22 +16,22 @@ export interface IconContainerProps extends React.HTMLAttributes<HTMLSpanElement
 
 export interface RatingProps {
   /**
-   * 정밀도, 증가 또는 감소 값.
+   * Rating 정밀도, 증가 또는 감소 값.
    * @default 1
    */
   precision?: number;
   /**
-   * 최대 평가값.
+   * 최대 Rating 값.
    * @default 5
    */
   max?: number;
   /**
-   * Radio `input` 요소의 이름 속성값으로 양식 내에서 고유해야합니다.
+   * Radio `input` 요소의 이름 속성값으로 양식 내에서 고유한 값.
    */
   name?: string;
   /**
    * 읽기전용 여부
-   *`true` 인 경우 모든 hover 및 focus event 제거됩니다.
+   *`true` 인 경우 모든 hover 및 focus event 제거.
    * @default false
    */
   readOnly?: boolean;
@@ -45,9 +46,13 @@ export interface RatingProps {
    */
   size?: number;
   /**
-   * 평가값.
+   * Rating 값.
    */
   value?: number | null;
+  /**
+   * prefix className.
+   */
+  prefix?: string;
   /**
    * 비어있을 때 표시되는 아이콘.
    * @default <StarBorderIcon size="24" />
@@ -58,15 +63,14 @@ export interface RatingProps {
    * @default <StarIcon size="24" />
    */
   filledIcon?: React.ReactNode;
-
   /**
-   * 아이콘을 포함하는 구성 요소.
+   * 아이콘을 포함하는 컴포넌트.
    * @default function IconContainer(props) {
    *   const { value, ...other } = props;
    *   return <span {...other} />;
    * }
    */
-  IconContainerComponent?: React.ElementType;
+  IconContainerComponent?: React.ElementType<IconContainerProps>;
   /**
    * 값이 변경되면 호출할 콜백함수.
    * @param {React.SyntheticEvent} event 콜백 이벤트
@@ -91,9 +95,9 @@ const RatingRoot = styled('span')<{ size: number; readOnly: boolean; disabled: b
   display: inline-flex;
   position: relative;
   text-align: left;
-  cursor: pointer;
   font-size: ${({ size }) => `${size}px`};
   opacity: ${({ disabled }) => (disabled ? '.38' : undefined)};
+  cursor: pointer;
   pointer-events: ${({ readOnly, disabled }) => (readOnly || disabled ? 'none' : undefined)};
 `;
 
@@ -106,20 +110,21 @@ const Rating = (props?: RatingProps) => {
     disabled = false,
     size = 24,
     value: valueProp = null,
+    prefix,
     emptyIcon = <StarBorderIcon />,
     filledIcon = <StarIcon />,
     IconContainerComponent,
     onChange,
   } = props ?? {};
 
-  const [valueDerived, setValueState] = useState(valueProp);
+  const [valueState, setValueState] = useState(valueProp);
   const [{ hover, focus }, setState] = useState({ hover: -1, focus: -1 });
   const [isFocused, setIsFocused] = useState(false);
   const [emptyValueFocused, setEmptyValueFocused] = useState(false);
   const rootRef = useRef<HTMLSpanElement>(null);
 
-  const valueRounded = roundValueToPrecision(valueDerived, precision);
-  let value = valueRounded;
+  const selectedValue = roundValueToPrecision(valueState, precision);
+  let value = selectedValue;
   if (hover !== -1) value = hover;
   if (focus !== -1) value = focus;
 
@@ -153,7 +158,6 @@ const Rating = (props?: RatingProps) => {
     if (!rootNode) return;
 
     const { width, left } = rootNode.getBoundingClientRect();
-
     const percent = (e.clientX - left) / width;
     // `precision/2` 아이콘 사이에 마우스를 가져가면 정밀도 규칙에 따라 가장 가까운 숫자가 선택.
     const newHover = roundValueToPrecision(max * percent + precision / 2, precision) as number;
@@ -192,12 +196,15 @@ const Rating = (props?: RatingProps) => {
     setState((prev) => ({ hover: prev.hover, focus: newFocus }));
   };
 
+  const classes = generatePrefixClasses(ratingClasses, prefix);
+
   const ratingItemProps = {
+    classes,
     name,
     readOnly,
     disabled,
-    ratingValue: value,
-    ratingValueRounded: valueRounded,
+    activeRatingValue: value,
+    selectedRatingValue: selectedValue,
     size,
     hover,
     focus,
@@ -218,7 +225,7 @@ const Rating = (props?: RatingProps) => {
       disabled={disabled}
       onMouseMove={readOnly ? undefined : handleMouseMove}
       onMouseLeave={readOnly ? undefined : handleMouseLeave}
-      className={clsx({ [ratingClasses.focusVisible]: isFocused })}
+      className={clsx(classes.root, { [classes.focusVisible]: isFocused })}
     >
       {[...new Array(max)].map((_, index) => {
         const itemValue = index + 1;
@@ -228,7 +235,7 @@ const Rating = (props?: RatingProps) => {
           const items = Array.from(new Array(1 / precision));
 
           return (
-            <RatingDecimal key={index} styleState={{ iconActive: isActive }}>
+            <RatingDecimal key={index} state={{ iconActive: isActive }} classes={classes}>
               {items.map((_, indexDecimal) => {
                 const itemDecimalValue = roundValueToPrecision(
                   itemValue - 1 + (indexDecimal + 1) * precision,
@@ -262,15 +269,15 @@ const Rating = (props?: RatingProps) => {
       })}
       {!readOnly && !disabled && (
         <RatingLabel
-          className={clsx(ratingClasses.label, ratingClasses.labelEmptyValueActive)}
-          styleState={{ labelEmptyValueActive: emptyValueFocused }}
+          className={clsx(classes.label, classes.labelEmptyValueActive)}
+          state={{ labelEmptyValueActive: emptyValueFocused }}
         >
           <VisuallyHiddenInput
             type="radio"
-            className={ratingClasses.visuallyHiddenInput}
+            className={classes.visuallyHiddenInput}
             id={`${name}-empty`}
             name={name}
-            checked={valueRounded == null}
+            checked={selectedValue == null}
             onFocus={() => setEmptyValueFocused(true)}
             onBlur={() => setEmptyValueFocused(false)}
             onChange={handleChange}
