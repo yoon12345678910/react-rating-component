@@ -155,7 +155,7 @@ const Rating = (props?: RatingProps) => {
     setIsFocused(false);
     setValueState(null);
 
-    if (onChange) onChange(e, null);
+    if (onChange && parseFloat(e.currentTarget.value) === selectedValue) onChange(e, null);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLSpanElement>) => {
