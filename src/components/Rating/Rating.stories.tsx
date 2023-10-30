@@ -1,9 +1,10 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
-import Rating, { RatingProps } from '../components/Rating';
-import { HeartBorderIcon, HeartIcon } from '../components/HeartIcon';
-import FaceIcon from '../components/FaceIcon';
+import Rating, { RatingProps } from './Rating';
+
+import { HeartBorderIcon, HeartIcon } from '../HeartIcon';
+import FaceIcon from '..//FaceIcon';
 
 const meta: Meta<RatingProps> = {
   title: 'Rating',
