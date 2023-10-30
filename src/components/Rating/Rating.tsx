@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useId, useState, useRef } from 'react';
 import clsx from 'clsx';
 import styled from '@emotion/styled';
 
@@ -115,7 +115,7 @@ const RatingRoot = styled('span')<{ size: number; readOnly: boolean; disabled: b
 
 const Rating = (props?: RatingProps) => {
   const {
-    name,
+    name: nameProp,
     precision = 1,
     max = 5,
     readOnly = false,
@@ -130,6 +130,9 @@ const Rating = (props?: RatingProps) => {
     IconContainerComponent,
     onChange,
   } = props ?? {};
+
+  const defaultId = useId();
+  const name = nameProp ?? defaultId;
 
   const [valueState, setValueState] = useControlled({
     controlled: valueProp,
