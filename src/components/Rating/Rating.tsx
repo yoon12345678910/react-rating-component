@@ -10,11 +10,13 @@ import RatingLabel from './RatingLabel';
 import VisuallyHiddenInput from './VisuallyHiddenInput';
 import { StarIcon, StarBorderIcon } from './StarIcon';
 
+import useControlled from '../useControlled';
+
 export interface IconContainerProps extends React.HTMLAttributes<HTMLSpanElement> {
   value: number;
 }
 
-export type RatingProps = {
+export interface RatingProps {
   /**
    * Rating 정밀도, 증가 또는 감소 값.
    * @default 1
@@ -51,6 +53,11 @@ export type RatingProps = {
    */
   size?: number;
   /**
+   * Rating 기본값. 비제어 컴포넌트일때 사용.
+   * @default null
+   */
+  defaultValue?: number;
+  /**
    * Rating 값.
    */
   value?: number | null;
@@ -82,7 +89,7 @@ export type RatingProps = {
    * @param {number|null} value 새로운값
    */
   onChange?: (e: React.SyntheticEvent, value: number | null) => void;
-};
+}
 
 /**
  * `precision` 에 따라 가장 가까운 숫자 찾기.
@@ -115,7 +122,8 @@ const Rating = (props?: RatingProps) => {
     disabled = false,
     highlightSelectedOnly = false,
     size = 24,
-    value: valueProp = null,
+    defaultValue = null,
+    value: valueProp,
     prefix,
     emptyIcon = <StarBorderIcon />,
     filledIcon = <StarIcon />,
@@ -123,7 +131,10 @@ const Rating = (props?: RatingProps) => {
     onChange,
   } = props ?? {};
 
-  const [valueState, setValueState] = useState(valueProp);
+  const [valueState, setValueState] = useControlled({
+    controlled: valueProp,
+    defaultValue: defaultValue,
+  });
   const [{ hover, focus }, setState] = useState({ hover: -1, focus: -1 });
   const [isFocused, setIsFocused] = useState(false);
   const [emptyValueFocused, setEmptyValueFocused] = useState(false);
