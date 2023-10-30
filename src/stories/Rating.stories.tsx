@@ -1,4 +1,5 @@
 import { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 
 import Rating, { RatingProps } from '../components/Rating';
 import { HeartBorderIcon, HeartIcon } from '../components/HeartIcon';
@@ -26,18 +27,47 @@ export const Default: Story = {
     return (
       <>
         <div>
-          <Rating name="default-value-1" {...args} precision={1} value={2} />
-        </div>
-        <div>
-          <Rating name="default-value-2" {...args} precision={0.5} value={3.5} />
-        </div>
-        <div>
-          <Rating name="default-value-1" {...args} size={30} precision={1} />
+          <Rating name="default-value-1" {...args} />
         </div>
       </>
     );
   },
+  argTypes: {
+    value: { control: { type: null } },
+  },
   args: {
+    precision: 0.5,
+    max: 5,
+    size: 24,
+    defaultValue: 3,
+  },
+};
+
+export const ParentControlled: Story = {
+  decorators: [
+    (_Rating, context) => {
+      const [value, setValue] = useState<number | null>(3);
+      const onChange: RatingProps['onChange'] = (_, value) => {
+        setValue(value);
+      };
+      return <_Rating args={{ ...context.args, value, onChange }} />;
+    },
+  ],
+  render: (args) => {
+    return (
+      <>
+        <div>
+          <Rating name="controlled-value-1" {...args} />
+        </div>
+      </>
+    );
+  },
+  argTypes: {
+    defaultValue: { control: { type: null } },
+    value: { control: { type: null } },
+  },
+  args: {
+    precision: 0.5,
     max: 5,
     size: 24,
   },
@@ -57,7 +87,7 @@ export const ReadOnly: Story = {
     precision: 0.5,
     max: 5,
     size: 18,
-    value: 4.5,
+    defaultValue: 4.5,
   },
 };
 
@@ -75,7 +105,7 @@ export const Disabled: Story = {
     precision: 0.5,
     max: 10,
     size: 18,
-    value: 8.5,
+    defaultValue: 8.5,
   },
 };
 
@@ -93,7 +123,7 @@ export const CustomIcon: Story = {
     precision: 0.5,
     max: 5,
     size: 42,
-    value: 4.5,
+    defaultValue: 4.5,
   },
 };
 
@@ -118,6 +148,6 @@ export const IconContainerComponent: Story = {
   },
   args: {
     size: 42,
-    value: 4,
+    defaultValue: 4,
   },
 };

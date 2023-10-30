@@ -6,13 +6,13 @@ function App() {
   return (
     <>
       <div>
-        <Rating name="value-1" size={18} value={4} readOnly />
+        <Rating name="value-1" size={18} defaultValue={4} readOnly />
       </div>
       <div>
-        <Rating name="value-2" precision={0.5} size={24} max={10} value={3.5} />
+        <Rating name="value-2" precision={0.5} size={24} max={10} defaultValue={3.5} />
       </div>
       <div>
-        <Rating name="value-3" size={24} value={5} disabled />
+        <Rating name="value-3" size={24} defaultValue={5} disabled />
       </div>
       <div>
         <Rating name="value-4" precision={0.1} size={54} max={3} />
