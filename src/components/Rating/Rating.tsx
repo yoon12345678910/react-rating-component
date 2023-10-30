@@ -294,6 +294,7 @@ const Rating = (props?: RatingProps) => {
             className={classes.visuallyHiddenInput}
             id={`${name}-empty`}
             name={name}
+            value={''}
             checked={selectedValue == null}
             onFocus={() => setEmptyValueFocused(true)}
             onBlur={() => setEmptyValueFocused(false)}
