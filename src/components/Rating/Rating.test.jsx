@@ -8,10 +8,10 @@ import generatePrefixClasses from './generatePrefixClasses';
 
 describe('<Rating />', () => {
   it('렌더링 되나요?', () => {
-    const { container } = render(<Rating />);
-    const classes = generatePrefixClasses(ratingClasses);
-
-    expect(container.firstChild).toHaveClass(classes.root);
+    // const { container } = render(<Rating />);
+    // const classes = generatePrefixClasses(ratingClasses);
+    // expect(container.firstChild).toHaveClass(classes.root);
+    expect(false).toBeTruthy();
   });
 
   it('값이 제공된 정밀도로 반올림되나요?', () => {
